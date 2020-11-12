@@ -1,6 +1,7 @@
 #
 #    GPT - Grid Python Toolkit
 #    Copyright (C) 2020  Christoph Lehner (christoph.lehner@ur.de, https://github.com/lehner/gpt)
+#    2020 Tilo Wettig <tilo.wettig@ur.de>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +31,13 @@ class staggered(shift, matrix_operator):
         shift.__init__(self, U, params)
 
         Nc = U[0].otype.Nc
-        otype = g.ot_vector_color(Nc)
+        if params["Nd"] is None:
+            Nd = 4
+        if "adjoint" in U[0].otype.__name__:
+            otype = g.ot_vector_color(Nc*Nc-1)
+        else:
+            otype = g.ot_vector_color(Nc)
+        grid = U[0].grid
         grid = U[0].grid
         self.mass = params["mass"]
 
@@ -45,13 +52,24 @@ class staggered(shift, matrix_operator):
         )
 
         # staggered phases
-        self.phases = g.complex(grid)[4]
-        
-    
+        # check gpt/lib/gpt/qis/map_canonical.py and
+        # Grid/Grid/qcd/action/fermion/StaggeredImpl.h
+        self.phases = [g.complex(grid) for i in range(Nd)]
+        for mu in range(Nd):
+            self.phases[mu][:] = 1.0
+        for n in g.coordinates(grid):
+            if n[0] % 2 == 1:
+                self.phases[1][:] = -1.0
+            if (n[0] + n[1]) % 2 == 1:
+                self.phases[2][:] = -1.0
+            if (n[0] + n[1] + n[2]) % 2 == 1:
+                self.phases[3][:] = -1.0
+
+
     def _Mshift(self, dst, src):
         assert dst != src
         dst[:] = 0
-        for mu in range(4):
+        for mu in range(Nd):
             src_plus = g.eval(self.forward[mu] * src)
             src_minus = g.eval(self.backward[mu] * src)
             dst += phases[mu] * ( src_plus - src_minus ) / 2.0 
