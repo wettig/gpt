@@ -25,19 +25,17 @@ from gpt import matrix_operator
 
 class staggered(shift, matrix_operator):
     # M_xy = 1/2 sum_mu eta_mu(x) [ U_mu(x) delta_{x+mu,y} - U_mu^dagger(x-mu) delta_{x-mu,y} ] + m delta_xy
+    # gauge field could also be SU(2) or adjoint (see otype)
     @params_convention()
     def __init__(self, U, params):
 
         shift.__init__(self, U, params)
 
         Nc = U[0].otype.Nc
-        if params["Nd"] is None:
-            Nd = 4
         if "adjoint" in U[0].otype.__name__:
             otype = g.ot_vector_color(Nc*Nc-1)
         else:
             otype = g.ot_vector_color(Nc)
-        grid = U[0].grid
         grid = U[0].grid
         self.mass = params["mass"]
 
@@ -52,27 +50,37 @@ class staggered(shift, matrix_operator):
         )
 
         # staggered phases
-        # check gpt/lib/gpt/qis/map_canonical.py and
+        # see also gpt/lib/gpt/qis/map_canonical.py and
         # Grid/Grid/qcd/action/fermion/StaggeredImpl.h
-        self.phases = [g.complex(grid) for i in range(Nd)]
-        for mu in range(Nd):
+        self.phases = [g.complex(grid) for i in range(4)]
+        for mu in range(4):
             self.phases[mu][:] = 1.0
-        for n in g.coordinates(grid):
-            if n[0] % 2 == 1:
-                self.phases[1][:] = -1.0
-            if (n[0] + n[1]) % 2 == 1:
-                self.phases[2][:] = -1.0
-            if (n[0] + n[1] + n[2]) % 2 == 1:
-                self.phases[3][:] = -1.0
-
+        for x in range(0,grid.fdimensions[0],2):
+            self.phases[1][x+1, :, :, :] = -1.0
+            for y in range(0,grid.fdimensions[1],2):
+                self.phases[2][x, y+1, :, :] = -1.0
+                self.phases[2][x+1, y, :, :] = -1.0
+                for z in range(0,grid.fdimensions[2],2):
+                    self.phases[3][x, y, z+1, :] = -1.0
+                    self.phases[3][x, y+1, z, :] = -1.0
+                    self.phases[3][x+1, y, z, :] = -1.0
+                    self.phases[3][x+1, y+1, z+1, :] = -1.0
+        # use stride>1 once it is implemented:
+        # self.phases[1][1::2, :, :, :] = -1.0
+        # self.phases[2][0::2, 1::2, :, :] = -1.0
+        # self.phases[2][1::2, 0::2, :, :] = -1.0
+        # self.phases[3][0::2, 0::2, 1::2, :] = -1.0
+        # self.phases[3][0::2, 1::2, 0::2, :] = -1.0
+        # self.phases[3][1::2, 0::2, 0::2, :] = -1.0
+        # self.phases[3][1::2, 1::2, 1::2, :] = -1.0
 
     def _Mshift(self, dst, src):
         assert dst != src
         dst[:] = 0
-        for mu in range(Nd):
+        for mu in range(4):
             src_plus = g.eval(self.forward[mu] * src)
             src_minus = g.eval(self.backward[mu] * src)
-            dst += phases[mu] * ( src_plus - src_minus ) / 2.0 
+            dst += self.phases[mu] * ( src_plus - src_minus ) / 2.0 
 
     def _Mdiag(self, dst, src):
         assert dst != src

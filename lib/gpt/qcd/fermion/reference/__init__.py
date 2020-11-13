@@ -17,3 +17,4 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 from gpt.qcd.fermion.reference.wilson import wilson
+from gpt.qcd.fermion.reference.staggered import staggered
