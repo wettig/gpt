@@ -50,8 +50,7 @@ class staggered(shift, matrix_operator):
         )
 
         # staggered phases
-        # see also gpt/lib/gpt/qis/map_canonical.py and
-        # Grid/Grid/qcd/action/fermion/StaggeredImpl.h
+        # see also Grid/Grid/qcd/action/fermion/StaggeredImpl.h
         self.phases = [g.complex(grid) for i in range(4)]
         for mu in range(4):
             self.phases[mu][:] = 1.0
