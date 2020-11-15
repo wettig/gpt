@@ -72,6 +72,8 @@ def run_test(U, Nadd):
 # staggered parameters
 p = {
     "mass": 0,
+    "mu5": 0,
+    "hop": 1,
     "boundary_phases": [1.0, 1.0, 1.0, 1.0],
 }
 
