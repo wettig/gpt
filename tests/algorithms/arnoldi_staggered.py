@@ -10,13 +10,13 @@
 # * the total number of eigenvalues is Nrep*V
 #   - Nrep = Nc (fundamental) or Nc^2-1 (adjoint)
 #   - V = lattice volume
-# * sum rule:  tr(-D^2) = 2*Nrep*V
+# * sum rule:  tr(-D^2) = 2*Nrep*V = 2*Nev
 
 import gpt as g
 import numpy as np
 import sys
 
-def run_test(U, Nadd):
+def run_test(U):
     """ 
     Compute all eigenvalues of D_staggered for different colors and
     representations and check the exact sum rule for tr(D^2)
@@ -44,12 +44,17 @@ def run_test(U, Nadd):
     start[:] = g.vector_color([1 for i in range(Nrep)], Nrep)
 
     # Arnoldi with modest convergence criterion
-    # * with Nmin = Nmax = Nstop = Nev, Arnoldi misses some eigenvalues
-    #   -> sum rule tr(-D^2) = 2*Nev is not satisfied
-    # * if a few (Nadd) "additional" eval are requested, Arnoldi finds all evals
-    #   (and produces extraneous evals near zero) -> sum rule satisfied
-    Neval = Nev+Nadd
-    a = g.algorithms.eigen.arnoldi(Nmin=Neval, Nmax=Neval, Nstep=10, Nstop=Neval, resid=1e-5)
+    # Typically the Krylov space needs to be larger than Nev to find all evals.
+    # The extraneous evals found by Arnoldi are essentially zero.
+    # * Nstop = number of evals to be computed
+    # * Nmin = when to start checking convergence (must be >= Nstop)
+    # * Nstep = interval for convergence checks (should not be too small to minimize cost of check)
+    # * Nmax = when to abort
+    Neval = Nev + 50 
+    # The following doesn't work.
+    a = g.algorithms.eigen.arnoldi(Nmin=Nev, Nmax=Neval, Nstep=20, Nstop=Nev, resid=1e-5)
+    # The following works.
+    a = g.algorithms.eigen.arnoldi(Nmin=Neval, Nmax=Neval, Nstep=20, Nstop=Neval, resid=1e-5)
     evec, evals = a(stagg, start)
 
     # extract imaginary parts and delete extraneous eigenvalues near zero
@@ -61,8 +66,8 @@ def run_test(U, Nadd):
     sum = (ev*ev).sum()
     g.message(f"tr(-D^2): {sum}, expected: {2*Nev}")
     assert abs(sum - 2*Nev) <1e-3
-
     g.message(f"Test passed for SU({Nc}) {rep}.")
+
     return ev
 
 ########################################################
@@ -84,12 +89,12 @@ grid_sp = g.grid(L, g.single)
 
 # SU(3) fundamental
 U = g.qcd.gauge.random(grid_sp, g.random("test"))
-ev = run_test(U, 36)
+ev = run_test(U)
 
 # SU(2) fundamental
 U = g.qcd.gauge.random(grid_sp, g.random("test"), otype=g.ot_matrix_su2_fundamental())
-ev = run_test(U, 28)
+ev = run_test(U)
 
 # SU(2) adjoint
 U = g.qcd.gauge.random(grid_sp, g.random("test"), otype=g.ot_matrix_su2_adjoint())
-ev = run_test(U, 45)
+ev = run_test(U)
