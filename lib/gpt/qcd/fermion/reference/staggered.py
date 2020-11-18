@@ -32,10 +32,6 @@ class staggered(shift, matrix_operator):
     @params_convention()
     def __init__(self, U, params):
 
-        g.message(U[0][0,0,0,0])
-        g.message(U[1][1,0,0,0])
-        g.message(U[2][1,1,0,0])
-
         shift.__init__(self, U, params)
 
         Nc = U[0].otype.Nc
@@ -118,17 +114,6 @@ class staggered(shift, matrix_operator):
         dst[:] = 0
         if (self.mu5 != 0):
             for [i, j, k] in permutations([0, 1, 2]):
-#                g.message(src[0,0,0,0])
-#                g.message(src[1,0,0,0])
-#                g.message(src[1,1,0,0])
-#                g.message(src[1,1,1,0])
-#                tmp = g.eval(self.forward[0] * src)
-#                g.message(tmp[0,0,0,0])
-#                tmp = g.eval(self.forward[0] * self.forward[1] * src)
-#                g.message(tmp[0,0,0,0])
-#                tmp = g.eval(self.forward[0] * self.forward[1] * self.forward[2] * src)
-#                g.message(tmp[0,0,0,0])
-#                input("Press Enter to continue...")
                 src_plus = g.eval(self.forward[i] * self.forward[j] * self.forward[k] * src)
                 src_minus = g.eval(self.backward[k] * self.backward[j] * self.backward[i] * src)
                 dst += self.s * ( src_plus + src_minus ) * self.mu5 / (-12.0)
