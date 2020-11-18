@@ -20,8 +20,7 @@ def run_test(U):
     """ 
     Compute all eigenvalues of D_staggered for different colors and
     representations and check the exact sum rule for tr(D^2)
-    Inputs: U    = gauge field
-            Nadd = additional eigenvalues for Arnoldi (see below) 
+    Input:  U = gauge field
     Output: imaginary parts of the eigenvalues
     """
 
