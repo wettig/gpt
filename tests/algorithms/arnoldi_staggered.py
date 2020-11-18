@@ -82,7 +82,7 @@ p = {
     "boundary_phases": [1.0, 1.0, 1.0, 1.0],
 }
 
-# grid (each dimensions must be at least 4 to get correct sum rule; why?)
+# grid (each dimension must be at least 4 to get correct sum rule)
 L = [8, 4, 4, 4]
 grid_dp = g.grid(L, g.double)
 grid_sp = g.grid(L, g.single)
