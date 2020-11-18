@@ -36,7 +36,7 @@ def run_test(U):
     Nev = Nrep*Volume
 
     # staggered operator
-    stagg = g.qcd.fermion.reference.staggered(U,p)
+    stagg = g.qcd.fermion.reference.staggered(U, p)
 
     # start vector
     start = g.vector_color(U[0].grid, Nrep)
@@ -51,7 +51,7 @@ def run_test(U):
     # * Nmax = when to abort
     Neval = Nev + 50 
     # The following doesn't work.
-    a = g.algorithms.eigen.arnoldi(Nmin=Nev, Nmax=Neval, Nstep=20, Nstop=Nev, resid=1e-5)
+    # a = g.algorithms.eigen.arnoldi(Nmin=Nev, Nmax=Neval, Nstep=20, Nstop=Nev, resid=1e-5)
     # The following works.
     a = g.algorithms.eigen.arnoldi(Nmin=Neval, Nmax=Neval, Nstep=20, Nstop=Neval, resid=1e-5)
     evec, evals = a(stagg, start)
@@ -62,9 +62,9 @@ def run_test(U):
     ev = np.concatenate([ev[:Nev//2], ev[-Nev//2:]])
 
     # check sum rule
-    sum = (ev*ev).sum()
-    g.message(f"tr(-D^2): {sum}, expected: {2*Nev}")
-    assert abs(sum - 2*Nev) <1e-3
+    summe = sum(ev*ev)
+    g.message(f"tr(-D^2): {summe}, expected: {2*Nev}")
+    assert abs(summe - 2*Nev) <1e-3
     g.message(f"Test passed for SU({Nc}) {rep}.")
 
     return ev
