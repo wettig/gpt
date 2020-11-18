@@ -117,10 +117,7 @@ class staggered(shift, matrix_operator):
         assert dst != src
         dst[:] = 0
         if (self.mu5 != 0):
-            for ijk in permutations([0,1,2]):
-                i = ijk[0]
-                j = ijk[1]
-                k = ijk[2]
+            for [i, j, k] in permutations([0, 1, 2]):
 #                g.message(src[0,0,0,0])
 #                g.message(src[1,0,0,0])
 #                g.message(src[1,1,0,0])
