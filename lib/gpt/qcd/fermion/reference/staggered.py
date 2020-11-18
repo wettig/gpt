@@ -21,6 +21,7 @@ import gpt as g
 from gpt.params import params_convention
 from gpt.core.covariant import shift
 from gpt import matrix_operator
+from itertools import permutations
 
 
 class staggered(shift, matrix_operator):
@@ -30,6 +31,10 @@ class staggered(shift, matrix_operator):
     # https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
     @params_convention()
     def __init__(self, U, params):
+
+        g.message(U[0][0,0,0,0])
+        g.message(U[1][1,0,0,0])
+        g.message(U[2][1,1,0,0])
 
         shift.__init__(self, U, params)
 
@@ -42,7 +47,7 @@ class staggered(shift, matrix_operator):
         self.mass = params["mass"]
         self.hop  = params["hop"]
         self.mu5  = params["mu5"]
-
+        
         self.Mdiag = g.matrix_operator(
             lambda dst, src: self._Mdiag(dst, src), otype=otype, grid=grid
         )
@@ -86,6 +91,8 @@ class staggered(shift, matrix_operator):
         for y in range(0,grid.fdimensions[1],2):
             self.s[:, y, :, :] = 1.0
             self.s[:, y+1, :, :] = -1.0
+            # self.s[:, :, :, y] = 1.0
+            # self.s[:, :, :, y+1] = -1.0
         # use stride>1 once it is implemented:
         # self.s[1][:, 0::2, :, :] = 1.0
         # self.s[1][:, 1::2, :, :] = -1.0
@@ -107,21 +114,28 @@ class staggered(shift, matrix_operator):
                 dst += self.phases[mu] * ( src_plus - src_minus ) / 2.0 
 
     def _Mchiral(self, dst, src):
-        # This doesn't work yet.
         assert dst != src
         dst[:] = 0
         if (self.mu5 != 0):
-            for ijk in [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]:
+            for ijk in permutations([0,1,2]):
                 i = ijk[0]
                 j = ijk[1]
                 k = ijk[2]
-                src_plus = g.eval(self.forward[i] * src)
-                src_minus = g.eval(self.backward[i] * src)
-#                src_plus = g.eval(self.forward[i].forward[j].forward[k] * self.forward[j].forward[k] * self.forward[k] * src)
-#                src_minus = g.eval(self.backward[i].backward[j].backward[k] * self.backward[j].backward[k] * self.backward[k] * src)
-                dst += self.s * ( src_plus - src_minus ) * mu5 / 12.0 
+#                g.message(src[0,0,0,0])
+#                g.message(src[1,0,0,0])
+#                g.message(src[1,1,0,0])
+#                g.message(src[1,1,1,0])
+#                tmp = g.eval(self.forward[0] * src)
+#                g.message(tmp[0,0,0,0])
+#                tmp = g.eval(self.forward[0] * self.forward[1] * src)
+#                g.message(tmp[0,0,0,0])
+#                tmp = g.eval(self.forward[0] * self.forward[1] * self.forward[2] * src)
+#                g.message(tmp[0,0,0,0])
+#                input("Press Enter to continue...")
+                src_plus = g.eval(self.forward[i] * self.forward[j] * self.forward[k] * src)
+                src_minus = g.eval(self.backward[k] * self.backward[j] * self.backward[i] * src)
+                dst += self.s * ( src_plus + src_minus ) * self.mu5 / (-12.0)
 
     def _M(self, dst, src):
         assert dst != src
         dst @= self.Mdiag * src + self.Mshift * src + self.Mchiral * src
-
