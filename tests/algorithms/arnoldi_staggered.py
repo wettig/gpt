@@ -33,7 +33,7 @@ def run_test(U):
     else:
         Nrep = Nc
         rep = "fundamental"
-    Volume = np.prod(U[0].grid.fdimensions)
+    Volume = U[0].grid.fsites
     Nev = Nrep*Volume
 
     # staggered operator
