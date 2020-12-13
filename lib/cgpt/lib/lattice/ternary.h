@@ -16,3 +16,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+template<typename T, typename S>
+void cgpt_ternary_from(Lattice<T>& dst, const Lattice<S>& a, const Lattice<T>& b, const Lattice<T>& c, PyObject* params) {
+  ASSERT(PyDict_Check(params));
+  auto op = get_str(params,"operator");
+  if (op == "?:") {
+    cgpt_where(dst, a, b, c);
+  } else {
+    ERR("Unknown operator %s", op.c_str());
+  }
+}

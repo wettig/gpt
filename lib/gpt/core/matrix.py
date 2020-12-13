@@ -20,6 +20,7 @@ import gpt, cgpt, numpy
 
 # matrix exponential
 def exp(i):
+    i = gpt.eval(i)  # accept expressions
     if i.grid.precision != gpt.double:
         x = gpt.convert(i, gpt.double)
     else:
@@ -51,6 +52,7 @@ def exp(i):
 
 
 def log(i, convergence_threshold=0.5):
+    i = gpt.eval(i)
     # i = n*(1 + x), log(i) = log(n) + log(1+x)
     # x = i/n - 1, |x|^2 = <i/n - 1, i/n - 1> = |i|^2/n^2 + |1|^2 - (<i,1> + <1,i>)/n
     # d/dn |x|^2 = -2 |i|^2/n^3 + (<i,1> + <1,i>)/n^2 = 0 -> 2|i|^2 == n (<i,1> + <1,i>)
@@ -81,8 +83,18 @@ def log(i, convergence_threshold=0.5):
 
 
 def inv(A):
+    A = gpt.eval(A)
     assert type(A) == gpt.lattice
     A_inv = gpt.lattice(A)
     to_list = gpt.util.to_list
     cgpt.invert_matrix(to_list(A_inv), to_list(A))
     return A_inv
+
+
+def det(A):
+    A = gpt.eval(A)
+    assert type(A) == gpt.lattice
+    r = gpt.complex(A.grid)
+    to_list = gpt.util.to_list
+    cgpt.determinant(r.v_obj[0], to_list(A))
+    return r

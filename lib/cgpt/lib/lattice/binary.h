@@ -16,3 +16,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+template<typename T>
+void cgpt_binary_from(Lattice<T>& dst, const Lattice<T>& a, const Lattice<T>& b, PyObject* params) {
+  ASSERT(PyDict_Check(params));
+  auto op = get_str(params,"operator");
+  if (op == "<") {
+    cgpt_lower_than(dst, a, b);
+  } else {
+    ERR("Unknown operator %s", op.c_str());
+  }
+}
