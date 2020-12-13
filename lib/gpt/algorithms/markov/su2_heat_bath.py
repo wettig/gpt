@@ -16,37 +16,18 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-import numpy
+#    Generate U with
+#
+#      P(U) = e^{ Re Tr Staple U } dU
+#
+#    based on 1985 Kennedy and Pendleton paper (PLB 156 p393-399)
+import gpt as g
 
 
-class precision:
-    pass
+class su2_heat_bath:
+    @g.params_convention(beta=6)
+    def __init__(self, rng, params):
+        self.rng = rng
 
-
-class single(precision):
-    nbytes = 4
-    real_dtype = numpy.float32
-    complex_dtype = numpy.complex64
-    eps = 1e-7
-
-    def __init__(self):
+    def __call__(self, U, staple):
         pass
-
-
-class double(precision):
-    nbytes = 8
-    real_dtype = numpy.float64
-    complex_dtype = numpy.complex128
-    eps = 1e-15
-
-    def __init__(self):
-        pass
-
-
-def str_to_precision(s):
-    if s == "single":
-        return single
-    elif s == "double":
-        return double
-    else:
-        assert 0
