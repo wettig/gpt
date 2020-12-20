@@ -25,13 +25,14 @@ from itertools import permutations
 
 
 class staggered(shift, matrix_operator):
-    '''
+    """
     D_xy = 1/2 sum_mu eta_mu(x) [ U_mu(x) delta_{x+mu,y} - U_mu^dagger(x-mu) delta_{x-mu,y} ] + m delta_xy
     * gauge field could also be SU(n) or adjoint (see otype)
     * mu5: coefficient of chiral chemical potential, see Eqs. (2.2) and (2.3) in
       https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
     * chiral: if True, chiral U(1) gauge field is present (in U list after the SU field)
-    '''
+    """
+
     @params_convention()
     def __init__(self, U, params):
 
@@ -67,16 +68,16 @@ class staggered(shift, matrix_operator):
         self.phases = [g.complex(grid) for i in range(4)]
         for mu in range(4):
             self.phases[mu][:] = 1.0
-        for x in range(0,grid.fdimensions[0],2):
-            self.phases[1][x+1, :, :, :] = -1.0
-            for y in range(0,grid.fdimensions[1],2):
-                self.phases[2][x, y+1, :, :] = -1.0
-                self.phases[2][x+1, y, :, :] = -1.0
-                for z in range(0,grid.fdimensions[2],2):
-                    self.phases[3][x, y, z+1, :] = -1.0
-                    self.phases[3][x, y+1, z, :] = -1.0
-                    self.phases[3][x+1, y, z, :] = -1.0
-                    self.phases[3][x+1, y+1, z+1, :] = -1.0
+        for x in range(0, grid.fdimensions[0], 2):
+            self.phases[1][x + 1, :, :, :] = -1.0
+            for y in range(0, grid.fdimensions[1], 2):
+                self.phases[2][x, y + 1, :, :] = -1.0
+                self.phases[2][x + 1, y, :, :] = -1.0
+                for z in range(0, grid.fdimensions[2], 2):
+                    self.phases[3][x, y, z + 1, :] = -1.0
+                    self.phases[3][x, y + 1, z, :] = -1.0
+                    self.phases[3][x + 1, y, z, :] = -1.0
+                    self.phases[3][x + 1, y + 1, z + 1, :] = -1.0
         # use stride > 1 once it is implemented:
         # self.phases[1][1::2, :, :, :] = -1.0
         # self.phases[2][0::2, 1::2, :, :] = -1.0
@@ -89,15 +90,15 @@ class staggered(shift, matrix_operator):
         # s(x) is defined between (2.2) and (2.3) in
         # https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
         self.s = g.complex(grid)
-        for y in range(0,grid.fdimensions[1],2):
+        for y in range(0, grid.fdimensions[1], 2):
             self.s[:, y, :, :] = 1.0
-            self.s[:, y+1, :, :] = -1.0
+            self.s[:, y + 1, :, :] = -1.0
         # use stride > 1 once it is implemented:
         # self.s[1][:, 0::2, :, :] = 1.0
         # self.s[1][:, 1::2, :, :] = -1.0
 
         # role of gamma_5 is played by eps(x) = (-1)^{x1+x2+x3+x4}
-        # quick temporary hack 
+        # quick temporary hack
         # won't be needed anymore once even-odd structure is implemented
         # see grid.py, lattice.py, checkerboard.py, coordinates.py
         # but eps is actually not needed here, but outside of staggered
@@ -119,17 +120,17 @@ class staggered(shift, matrix_operator):
         assert dst != src
         dst[:] = 0
         for mu in range(4):
-            src_plus = g.eval(self.forward[mu] * src)
-            src_minus = g.eval(self.backward[mu] * src)
+            src_plus = self.forward[mu] * src
+            src_minus = self.backward[mu] * src
             if self.chiral:
                 src_plus = self.theta[mu] * src_plus
                 src_minus = g.cshift(self.theta[mu], mu, -1) * src_minus
-            dst += self.phases[mu] * ( src_plus - src_minus ) / 2.0 
+            dst += self.phases[mu] * (src_plus - src_minus) / 2.0
         if self.mu5 != 0.0:
             for [i, j, k] in permutations([0, 1, 2]):
-                src_plus = g.eval(self.forward[i] * self.forward[j] * self.forward[k] * src)
-                src_minus = g.eval(self.backward[k] * self.backward[j] * self.backward[i] * src)
-                dst += self.s * ( src_plus + src_minus ) * self.mu5 / (-12.0)
+                src_plus = self.forward[i] * self.forward[j] * self.forward[k] * src
+                src_minus = self.backward[k] * self.backward[j] * self.backward[i] * src
+                dst += self.s * (src_plus + src_minus) * self.mu5 / (-12.0)
 
     def _M(self, dst, src):
         assert dst != src
