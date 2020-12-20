@@ -27,10 +27,10 @@ from itertools import permutations
 class staggered(shift, matrix_operator):
     '''
     D_xy = 1/2 sum_mu eta_mu(x) [ U_mu(x) delta_{x+mu,y} - U_mu^dagger(x-mu) delta_{x-mu,y} ] + m delta_xy
-    * gauge field could also be SU(2) or adjoint (see otype)
+    * gauge field could also be SU(n) or adjoint (see otype)
     * mu5: coefficient of chiral chemical potential, see Eqs. (2.2) and (2.3) in
       https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
-    * chiral: if True, chiral U(1) gauge field is present, passed in the U list after the SU field
+    * chiral: if True, chiral U(1) gauge field is present (in U list after the SU field)
     '''
     @params_convention()
     def __init__(self, U, params):
@@ -39,21 +39,17 @@ class staggered(shift, matrix_operator):
         shift.__init__(self, U[0:4], params)
 
         # stuff that's needed later on
-        Nc = U[0].otype.Nc
         otype = g.ot_vector_color(U[0].otype.Ndim)
         grid = U[0].grid
         self.mass = params["mass"] if "mass" in params else 0.0
         self.mu5 = params["mu5"] if "mu5" in params else 0.0
         self.chiral = params["chiral"] if "chiral" in params else False
 
-        # sanity checks and fields copies for chiral U(1) gauge field
+        # theta is the chiral U(1) gauge field (no need to copy, pointer is fine)
         if self.chiral:
             assert "mu5" not in params, "cannot have both mu5 and chiral in params"
             assert len(U) == 8, "chiral U(1) field missing?"
-            # theta is the chiral U(1) gauge field
-            self.theta = [g.copy(u) for u in U[4:8]]
-            self.U = [g.copy(u) for u in U[0:4]]
-            self.Udag = [g.eval(g.adj(u)) for u in self.U]
+            self.theta = U[4:8]
 
         # matrix operators
         self.Mooee = g.matrix_operator(
@@ -110,31 +106,30 @@ class staggered(shift, matrix_operator):
         #     for y in range(0,grid.fdimensions[1]):
         #         for z in range(0,grid.fdimensions[2]):
         #             for t in range(0,grid.fdimensions[3]):
-        #                 self.eps[x, y, z, t] = 1 - 2 * ( (x + y + z + t) % 2)
+        #                 self.eps[x, y, z, t] = 1 - 2 * ( (x + y + z + t) % 2 )
 
     def _Mooee(self, dst, src):
         assert dst != src
-        if self.mass == 0.0:
-            dst[:] = 0
-        else:
+        if self.mass != 0.0:
             dst @= self.mass * src
+        else:
+            dst[:] = 0
 
     def _Meooe(self, dst, src):
         assert dst != src
         dst[:] = 0
+        for mu in range(4):
+            src_plus = g.eval(self.forward[mu] * src)
+            src_minus = g.eval(self.backward[mu] * src)
+            if self.chiral:
+                src_plus = self.theta[mu] * src_plus
+                src_minus = g.cshift(self.theta[mu], mu, -1) * src_minus
+            dst += self.phases[mu] * ( src_plus - src_minus ) / 2.0 
         if self.mu5 != 0.0:
             for [i, j, k] in permutations([0, 1, 2]):
                 src_plus = g.eval(self.forward[i] * self.forward[j] * self.forward[k] * src)
                 src_minus = g.eval(self.backward[k] * self.backward[j] * self.backward[i] * src)
                 dst += self.s * ( src_plus + src_minus ) * self.mu5 / (-12.0)
-        for mu in range(4):
-            if self.chiral:
-                src_plus = g.eval(self.U[mu] * self.theta[mu] * g.cshift(src, mu, +1))
-                src_minus = g.eval(g.cshift(self.Udag[mu] * self.theta[mu] * src, mu, -1))
-            else:
-                src_plus = g.eval(self.forward[mu] * src)
-                src_minus = g.eval(self.backward[mu] * src)
-            dst += self.phases[mu] * ( src_plus - src_minus ) / 2.0 
 
     def _M(self, dst, src):
         assert dst != src
