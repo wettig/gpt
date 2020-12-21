@@ -1,0 +1,1002 @@
+
+create/smear.py,82
+def laplace(34,1209
+    def mat(35,1239
+def gauss(45,1539
+    def mat(51,1716
+
+create/sparse_grid.py,40
+def coordinates(23,904
+def zn(28,1050
+
+create/__init__.py,18
+def point(25,962
+
+create/wall.py,47
+def zn(24,934
+def z2(34,1216
+def z3(38,1295
+
+qcd/fermion/preconditioner/g5m.py,256
+class g5m_ne_instance:g5m_ne_instance29,1032
+    def __init__(30,1055
+        def _Mpc(35,1168
+        def _ident(39,1273
+        def _R(42,1335
+        def _S(45,1413
+class g5m_ne:g5m_ne56,1843
+    def __init__(58,1882
+    def __call__(61,1944
+
+qcd/fermion/preconditioner/sap.py,470
+def index2coor(83,2971
+class SapError(91,3181
+class sap_blk:sap_blk95,3219
+    def __init__(96,3234
+    def coor(135,4722
+    def pos(159,5637
+    def set_BC_Ufld(176,6293
+    def setBC_4D(182,6418
+class sap_instance:sap_instance199,7062
+    def __init__(200,7082
+class sap:sap233,8123
+    def __init__(235,8166
+    def __call__(239,8265
+class sap_cycle:sap_cycle243,8336
+    def __init__(245,8385
+    def __call__(250,8533
+        def inv(258,8831
+
+qcd/fermion/preconditioner/physical.py,212
+class physical_instance:physical_instance22,885
+    def __init__(23,910
+        def _L(34,1247
+        def _R_adj(38,1383
+class physical:physical59,1999
+    def __init__(60,2015
+    def __call__(63,2065
+
+qcd/fermion/preconditioner/eo2.py,646
+class eo2_base:eo2_base58,2150
+    def __init__(59,2166
+        def _N(77,3060
+        def _NDag(84,3299
+        def _NDagN(91,3557
+        def _L(95,3647
+        def _L_pseudo_inverse(102,3904
+        def _S(106,4022
+    def import_parity(144,5109
+    def export_parity(148,5263
+class eo2_ne_instance(153,5386
+    def __init__(154,5419
+        def _R(157,5493
+        def _RDag(164,5731
+class eo2_ne:eo2_ne183,6270
+    def __init__(185,6320
+    def __call__(188,6382
+class eo2_instance(192,6470
+    def __init__(193,6500
+        def _R(196,6574
+class eo2:eo2212,6974
+    def __init__(214,7021
+    def __call__(217,7083
+
+qcd/fermion/preconditioner/eo1.py,646
+class eo1_base:eo1_base62,2299
+    def __init__(63,2315
+        def _N(81,3238
+        def _NDag(88,3477
+        def _NDagN(95,3735
+        def _L(99,3825
+        def _L_pseudo_inverse(106,4053
+        def _S(110,4154
+    def import_parity(148,5241
+    def export_parity(152,5395
+class eo1_ne_instance(157,5518
+    def __init__(158,5551
+        def _R(161,5625
+        def _RDag(169,5905
+class eo1_ne:eo1_ne189,6523
+    def __init__(191,6573
+    def __call__(194,6635
+class eo1_instance(198,6723
+    def __init__(199,6753
+        def _R(202,6827
+class eo1:eo1219,7287
+    def __init__(221,7334
+    def __call__(224,7396
+
+qcd/fermion/preconditioner/mixed_dwf.py,246
+class mixed_dwf:mixed_dwf30,1078
+    def __init__(31,1095
+    def __call__(37,1306
+        def sep(45,1574
+        def mrg(48,1641
+        def _P(51,1705
+        def _P_mat(63,2100
+        def _P_inv_mat(66,2159
+        def inv(73,2348
+
+qcd/fermion/register.py,19
+def register(2,55
+
+qcd/fermion/operator.py,650
+class operator(24,999
+    def __init__(25,1036
+        class registry:registry72,2619
+    def Mdir(142,5021
+    def modified(150,5244
+    def converted(158,5455
+    def updated(161,5560
+    def update(169,5746
+    def split(174,5902
+    def _G5M(182,6252
+    def propagator(186,6350
+        def prop(192,6516
+class fine_operator(203,6802
+    def __init__(204,6833
+    def __del__(211,7055
+    def apply_unary_operator(214,7126
+    def apply_dirdisp_operator(220,7401
+class coarse_operator(229,7731
+    def __init__(230,7764
+    def __del__(247,8477
+    def apply_unary_operator(251,8578
+    def apply_dirdisp_operator(269,9335
+
+qcd/fermion/reference/wilson.py,138
+class wilson(25,1000
+    def __init__(29,1147
+    def _Meooe(55,2001
+    def _Mooee(66,2391
+    def _M(70,2500
+    def _G5M(74,2606
+
+qcd/fermion/reference/staggered.py,122
+class staggered(27,1077
+    def __init__(37,1570
+    def _Mooee(112,4961
+    def _Meooe(119,5121
+    def _M(135,5873
+
+qcd/fermion/__init__.py,114
+def wilson_clover(33,1202
+def rhq_columbia(47,1688
+def zmobius(61,1996
+def mobius(69,2264
+def coarse(75,2480
+
+qcd/gauge/smear/stout.py,95
+def project_to_traceless_anti_hermitian(25,1001
+def stout_general(34,1230
+def stout(49,1664
+
+qcd/gauge/create.py,107
+def create_links(25,990
+def random(70,2154
+    def init(71,2186
+def unit(78,2316
+    def init(79,2341
+
+qcd/gauge/loops.py,22
+def plaquette(23,926
+
+qcd/gauge/transformation.py,49
+def transformed(22,890
+        def _mat(27,976
+
+qcd/gauge/staples.py,43
+def staple(23,931
+def staple_sum(35,1290
+
+qcd/utils.py,51
+def ferm_to_prop(22,886
+def prop_to_ferm(27,1036
+
+core/mem.py,77
+def mem_host_available(22,901
+def mem_info(37,1281
+def mem_report(47,1503
+
+core/copy_plan.py,725
+class _view:_view22,898
+    def __init__(23,911
+    def __del__(26,964
+    def __len__(29,1028
+    def __iadd__(32,1097
+    def embed_in_communicator(38,1277
+class copy_plan_view:copy_plan_view45,1515
+    def __init__(46,1537
+    def get_index(66,2306
+    def __iadd__(71,2429
+class copy_plan_executer:copy_plan_executer79,2671
+    def __init__(80,2697
+    def __del__(84,2832
+    def __call__(87,2896
+    def info(92,3082
+class copy_plan:copy_plan96,3153
+    def __init__(97,3170
+    def __call__(111,3651
+class lattice_view:lattice_view122,3945
+    def __init__(123,3965
+    def view(128,4089
+class global_memory_view:global_memory_view138,4432
+    def __init__(139,4458
+    def view(143,4575
+
+core/checkpointer.py,257
+class checkpointer_none:checkpointer_none25,922
+    def __init__(26,947
+    def save(29,997
+    def load(32,1036
+class checkpointer:checkpointer36,1084
+    def __init__(37,1104
+    def save(50,1591
+    def load(86,3015
+    def read_view(123,4397
+
+core/random.py,280
+class random:random23,944
+    def __init__(24,958
+    def __del__(47,1597
+    def sample(50,1658
+    def normal(95,3190
+    def cnormal(99,3336
+    def uniform_real(103,3483
+    def uniform_int(110,3695
+    def zn(117,3901
+    def element(121,4045
+def sha256(163,4969
+
+core/util.py,262
+def is_num(25,1007
+def to_num(30,1125
+def value_to_tensor(41,1386
+def tensor_to_value(47,1515
+def to_list(58,1789
+def from_list(64,1933
+def is_list_instance(70,2046
+def entries_have_length(74,2165
+def is_callable(80,2298
+def all_have_attribute(86,2448
+
+core/block/__init__.py,17
+def grid(23,920
+
+core/block/map.py,320
+class map:map27,1126
+    def __init__(28,1137
+        def _project(52,1864
+        def _promote(56,2043
+    def __del__(76,2724
+    def orthonormalize(79,2788
+    def check_orthogonality(82,2863
+    def coarse_operator(99,3563
+        def mat(102,3669
+    def fine_operator(124,4543
+        def mat(131,4817
+
+core/component.py,66
+def _simple_matrix(24,959
+    def _mat(25,1006
+def pow(47,1565
+
+core/peekpoke.py,163
+def split_key_to_coordinates_and_indices(22,903
+def map_pos(62,1601
+def map_tidx_and_shape(107,2974
+def map_key(152,4535
+def peek(180,5417
+def poke(210,6144
+
+core/advise.py,184
+class infrequent_use:infrequent_use19,872
+class to_host:to_host23,923
+class to_accelerator:to_accelerator27,957
+def distribute(31,1005
+def advise(42,1277
+def prefetch(46,1345
+
+core/expr.py,732
+class factor_unary:factor_unary23,915
+class expr_unary:expr_unary30,997
+class expr:expr44,1391
+    def __init__(45,1403
+    def is_single(62,2053
+    def get_single(68,2289
+    def __mul__(75,2435
+    def __rmul__(104,3735
+    def __truediv__(110,3882
+    def __add__(115,4068
+    def __sub__(126,4420
+    def __neg__(129,4488
+    def __str__(132,4579
+class factor:factor162,5597
+    def __rmul__(163,5611
+    def __mul__(166,5675
+    def __truediv__(169,5738
+    def __add__(173,5841
+    def __sub__(176,5904
+    def __neg__(179,5967
+def get_lattice(183,6027
+def apply_type_right_to_left(194,6294
+def get_otype_from_multiplication(214,6853
+def get_otype_from_expression(247,7956
+def expr_eval(286,9181
+
+core/convert.py,20
+def convert(22,903
+
+core/split.py,148
+def split_lattices(27,970
+def unsplit(85,2639
+def split_sites(119,3595
+def split_block(133,4149
+def split_by_rank(138,4261
+def split(155,4807
+
+core/tensor.py,553
+class tensor:tensor24,916
+    def __init__(25,930
+    def __repr__(35,1205
+    def __getitem__(38,1302
+    def __setitem__(41,1374
+    def transposable(44,1452
+    def transpose(47,1530
+    def conj(52,1724
+    def adj(55,1798
+    def trace(62,2009
+    def norm2(83,2790
+    def __mul__(86,2861
+    def __rmul__(117,4170
+    def __add__(123,4348
+    def __truediv__(127,4498
+    def __eq__(130,4587
+    def __neg__(133,4672
+    def __sub__(136,4743
+    def __iadd__(140,4893
+    def __isub__(145,5038
+    def __itruediv__(150,5183
+
+core/grid.py,612
+class full:full23,915
+    def __init__(24,927
+class redblack:redblack31,1073
+    def __init__(32,1089
+class general:general40,1286
+    def __init__(41,1301
+def str_to_checkerboarding(48,1504
+def grid_from_description(61,1789
+def grid_get_mpi_default(70,2089
+class grid:grid91,2641
+    def __init__(92,2653
+    def describe(140,4018
+    def converted(154,4468
+    def split(170,4894
+    def inserted_dimension(173,5021
+    def removed_dimension(201,5931
+    def cartesian_rank(223,6607
+    def __str__(229,6781
+    def __del__(235,7054
+    def barrier(238,7113
+    def globalsum(241,7173
+
+core/precision.py,159
+class precision:precision22,887
+class single(26,915
+    def __init__(32,1038
+class double(36,1077
+    def __init__(42,1202
+def str_to_precision(46,1241
+
+core/coarse/__init__.py,195
+def create_links(27,1120
+def communicate_links(153,5249
+def recreate_links(170,5950
+def gamma5(174,6021
+def split_chiral(184,6270
+def unsplit_chiral(197,6637
+def prefactor_dagger(207,6912
+
+core/basis.py,108
+def orthogonalize(26,978
+def linear_combination(61,2098
+def rotate(72,2461
+def qr_decomposition(77,2587
+
+core/time.py,181
+def time(26,982
+class timer:timer30,1024
+    def __init__(31,1037
+    def __call__(39,1216
+    def total(69,2286
+    def __str__(72,2340
+    def create_print_arrays(88,2923
+
+core/coordinates.py,244
+def coordinates(23,965
+def apply_exp_ixp(48,1956
+def exp_ixp(59,2299
+    def mat(66,2438
+    def inv_mat(69,2504
+def fft(78,2748
+    def mat(79,2768
+    def mat_forward(85,3013
+    def mat_backward(88,3070
+def coordinate_mask(99,3287
+
+core/gamma.py,152
+def fill_sigmas(38,1537
+class gamma_base(51,1800
+    def __init__(52,1826
+    def __mul__(56,1918
+    def __rmul__(67,2246
+    def tensor(78,2576
+
+core/cartesian.py,127
+class cartesian_view:cartesian_view22,891
+    def __init__(23,913
+    def describe(83,2944
+    def views_for_node(86,3015
+
+core/transform.py,278
+def cshift(22,898
+def copy(44,1348
+def rank_inner_product(61,1682
+def inner_product(80,2339
+def norm2(85,2457
+def inner_product_norm2(103,2848
+def axpy_norm2(118,3297
+def axpy(131,3623
+def slice(140,3884
+def identity(146,4058
+def project(152,4155
+def where(157,4233
+
+core/lattice.py,738
+def get_mem_book(25,951
+class lattice_view_constructor:lattice_view_constructor29,993
+    def __init__(30,1025
+    def __getitem__(33,1087
+class lattice(38,1234
+    def __init__(42,1306
+    def __del__(82,2870
+    def advise(87,2994
+    def prefetch(94,3156
+    def checkerboard(101,3322
+    def describe(119,3911
+    def global_bytes(123,4133
+    def rank_bytes(126,4244
+    def view(130,4345
+    def __setitem__(133,4412
+    def __getitem__(170,5871
+    def mview(193,6606
+    def __repr__(196,6693
+    def __str__(199,6804
+    def __iadd__(212,7259
+    def __isub__(216,7348
+    def __imatmul__(220,7438
+    def __imul__(224,7531
+    def __itruediv__(228,7628
+    def __lt__(232,7729
+    def __gt__(240,8007
+
+core/checkerboard.py,216
+class even:even23,897
+    def inv(26,922
+class odd:odd30,962
+    def inv(33,986
+class none:none37,1027
+    def inv(40,1055
+def str_to_cb(44,1096
+def pick_checkerboard(55,1265
+def set_checkerboard(61,1453
+
+core/covariant.py,172
+class shift:shift23,939
+    def __init__(25,977
+        def _forward(45,1636
+            def wrap(46,1662
+        def _backward(51,1780
+            def wrap(52,1807
+
+core/mpi.py,60
+def rank(22,899
+def broadcast(27,955
+def barrier(32,1032
+
+core/matrix.py,68
+def exp(22,918
+def log(65,1780
+def inv(96,2769
+def det(105,2963
+
+core/object_type/base.py,30
+class ot_base:ot_base21,874
+
+core/object_type/__init__.py,583
+def gpt_object(28,1120
+def singlet(36,1341
+def matrix_color(40,1402
+def vector_color(44,1485
+def matrix_spin(48,1568
+def vector_spin(52,1649
+def matrix_spin_color(56,1730
+def vector_spin_color(60,1857
+def vsinglet(64,1984
+def msinglet(68,2053
+def matrix_su2_fundamental(74,2171
+def matrix_su2_adjoint(78,2272
+def matrix_su3_fundamental(82,2365
+def str_to_otype(88,2510
+def complex(134,3679
+def vcomplex(138,3725
+def mcomplex(142,3779
+def mcolor(146,3833
+def vcolor(150,3893
+def mspin(154,3946
+def vspin(158,3997
+def mspincolor(162,4048
+def vspincolor(166,4113
+
+core/object_type/container.py,797
+def decompose(26,957
+def get_range(33,1171
+class ot_singlet(48,1456
+    def identity(59,1728
+class ot_matrix_color(65,1811
+    def __init__(66,1843
+    def identity(83,2504
+class ot_vector_color(87,2608
+    def __init__(88,2640
+class ot_matrix_spin(109,3278
+    def __init__(110,3309
+class ot_vector_spin(128,3948
+    def __init__(129,3979
+class ot_matrix_spin_color(148,4606
+    def __init__(149,4643
+    def identity(174,5918
+class ot_vector_spin_color(184,6172
+    def __init__(185,6209
+    def distribute(215,7440
+class ot_vsinglet4(243,8700
+class ot_vsinglet10(249,8799
+class ot_vsinglet(255,8902
+    def __init__(261,9009
+    def distribute(282,9779
+class ot_msinglet4(290,9949
+class ot_msinglet10(296,10054
+class ot_msinglet(302,10165
+    def __init__(308,10272
+
+core/object_type/su_n.py,885
+def compute_structure_constant(28,1095
+def fundamental_to_adjoint(55,1746
+class ot_matrix_su_n_base(67,2075
+    def __init__(68,2119
+class ot_matrix_su_n_algebra(84,2638
+    def __init__(85,2689
+    def cartesian(88,2771
+    def coordinates(91,2817
+class ot_matrix_su_n_group(103,3242
+    def __init__(104,3291
+    def is_element(107,3373
+    def project(115,3712
+class ot_matrix_su_n_fundamental_algebra(140,4842
+    def __init__(141,4908
+    def generators(149,5189
+class ot_matrix_su_n_fundamental_group(185,6362
+    def __init__(188,6440
+    def cartesian(197,6797
+    def su2_subgroups(200,6882
+    def block_extract(209,7116
+    def block_insert(224,7748
+class ot_matrix_su_n_adjoint_algebra(241,8413
+    def __init__(244,8487
+    def generators(250,8737
+class ot_matrix_su_n_adjoint_group(268,9543
+    def __init__(269,9601
+    def cartesian(277,9883
+
+core/operator/matrix_operator.py,292
+class matrix_operator(26,999
+    def __init__(34,1199
+    def inv(71,2273
+    def adj(84,2707
+    def __mul__(97,3141
+    def __rmul__(128,4431
+    def converted(131,4508
+        def _converted(139,4834
+    def unary(175,6134
+    def __call__(182,6343
+            def mat(220,7454
+
+core/operator/unary.py,192
+def conj(24,916
+def transpose(41,1315
+def adj(61,1810
+def inv(85,2483
+def apply_expr_unary(92,2586
+def trace(98,2702
+def spin_trace(106,2899
+def color_trace(110,2970
+def sum(114,3043
+
+core/io/util.py,37
+def mview(23,974
+def crc32(30,1114
+
+core/io/save.py,162
+class format:format23,940
+    class gpt:gpt24,954
+        def __init__(26,998
+    class cevec:cevec29,1068
+        def __init__(31,1114
+def save(36,1194
+
+core/io/gpt_io.py,793
+def get_local_name(23,994
+class gpt_io:gpt_io39,1371
+    def __init__(41,1410
+    def flush(68,2233
+    def __del__(86,2772
+    def close_views(89,2817
+    def close_global(97,3019
+    def close(102,3138
+    def open_view(110,3357
+    def views_for_node(135,4257
+    def write_lattice(138,4337
+    def read_lattice(218,7029
+    def write_numpy(301,9937
+    def read_numpy(313,10348
+    def write(327,10877
+    def create_index(330,10941
+    def keep_context(371,12562
+    def read_index(379,12833
+class index_parser:index_parser435,14533
+    def __init__(436,14553
+    def peek(440,14634
+    def get_str(443,14703
+    def cmd(446,14813
+    def skip(449,14863
+    def get(452,14907
+    def eof(457,14988
+def writer(463,15123
+def save(467,15197
+def load(486,15506
+
+core/io/load.py,40
+def load_cgpt(23,983
+def load(52,1857
+
+core/io/cevec_io.py,275
+def get_local_name(30,1093
+def get_param(45,1460
+def mem_avail(51,1549
+def conformDiv(55,1626
+def FP_16_SIZE(60,1690
+def read_metadata(65,1768
+def get_vec(76,2013
+def get_ivec(88,2215
+def get_xvec(92,2267
+def truncate(96,2336
+def load(116,3098
+def save(475,15673
+
+core/io/corr_io.py,176
+class writer:writer22,928
+    def __init__(23,942
+    def write(29,1076
+    def close(43,1616
+class reader:reader51,1746
+    def __init__(52,1760
+    def glob(74,2413
+
+core/io/FILE.py,211
+class FILE:FILE42,1508
+    def __init__(43,1520
+    def __del__(50,1737
+    def close(54,1824
+    def tell(59,1930
+    def seek(64,2033
+    def read(69,2168
+    def write(76,2347
+    def flush(82,2521
+
+core/io/error.py,24
+class LoadError(19,872
+
+core/io/qlat_io.py,191
+class qlat_io:qlat_io29,1179
+    def __init__(30,1194
+    def read_header(39,1437
+    def getline(89,3277
+    def swap(105,3738
+    def read_lattice_single(115,3994
+def load(191,6101
+
+core/log.py,20
+def message(22,890
+
+core/merge.py,209
+def merge(29,1136
+def separate(105,3255
+def separate_indices(186,5684
+def separate_spin(231,6928
+def separate_color(235,7002
+def merge_indices(239,7078
+def merge_spin(274,8112
+def merge_color(279,8204
+
+default.py,291
+def get_all(22,890
+def get_single(33,1133
+def get_float(39,1234
+def get_int(46,1379
+def get_ivec(53,1507
+def is_verbose(85,2347
+def set_verbose(89,2392
+def push_verbose(96,2569
+def pop_verbose(101,2672
+def parse_verbose(105,2731
+def wrap_list(129,3244
+def process_flags(146,3771
+
+qis/gate.py,291
+def _H(21,874
+def _X(25,903
+def _R_z(29,932
+def _CNOT(33,979
+def _M(37,1020
+class circuit:circuit45,1162
+    def __init__(46,1177
+    def __or__(49,1233
+    def __mul__(52,1308
+    def dagger(58,1461
+def H(70,1782
+def X(74,1824
+def R_z(78,1866
+def CNOT(82,1926
+def M(86,2002
+
+qis/map_canonical.py,188
+class map_canonical:map_canonical27,1039
+    def __init__(28,1060
+    def coordinates_from_permutation(61,2214
+    def index_to_bits(73,2682
+    def coordinate_to_basis_name(79,2935
+
+qis/backends/static/state.py,326
+class state:state33,1509
+    def __init__(34,1522
+    def cloned(53,2205
+    def randomize(64,2477
+    def __str__(68,2601
+    def bit_flipped_lattice(90,3359
+    def X(97,3573
+    def R_z(100,3652
+    def H(107,3872
+    def CNOT(116,4248
+    def measure(124,4512
+def check_same(138,4970
+def check_norm(145,5135
+
+qis/backends/dynamic/state.py,354
+class state:state30,1140
+    def __init__(31,1153
+    def cloned(62,2193
+    def prefetch(75,2537
+    def randomize(90,3134
+    def __str__(94,3258
+    def bit_flipped_lattice(116,4038
+    def X(123,4274
+    def R_z(126,4353
+    def H(133,4617
+    def CNOT(142,5081
+    def measure(150,5389
+def check_same(168,5973
+def check_norm(178,6230
+
+repository.py,81
+def download(28,1030
+class repository:repository67,2079
+    def load(68,2097
+
+__init__.py,51
+class GPTModule(49,1365
+    def __call__(50,1400
+
+params.py,148
+class params_convention:params_convention22,904
+    def __init__(39,1615
+    def __call__(42,1713
+        def wrap(65,2462
+def params(86,3112
+
+algorithms/eigen/arnoldi.py,339
+class arnoldi_iteration:arnoldi_iteration25,980
+    def __init__(26,1005
+    def __call__(40,1291
+    def hessenberg(59,1867
+    def little_eig(68,2094
+    def rotate_basis_to_evec(82,2453
+    def single_evec(94,2768
+class arnoldi:arnoldi101,2968
+    def __init__(103,3064
+    def __call__(108,3227
+    def converged(132,3987
+
+algorithms/eigen/power_iteration.py,97
+class power_iteration:power_iteration22,890
+    def __init__(24,950
+    def __call__(30,1119
+
+algorithms/eigen/irl.py,128
+class irl:irl29,1417
+    def __init__(31,1484
+    def __call__(35,1570
+    def diagonalize(201,6773
+    def step(214,7223
+
+algorithms/eigen/evals.py,50
+class EvalsNotConverged(22,890
+def evals(27,995
+
+algorithms/inverter/deflate.py,81
+class deflate:deflate23,931
+    def __init__(25,979
+    def __call__(28,1110
+
+algorithms/inverter/preconditioned.py,120
+class preconditioned:preconditioned22,913
+    def __init__(24,962
+    def __call__(29,1128
+        def inv(34,1245
+
+algorithms/inverter/coarse_deflate.py,96
+class coarse_deflate:coarse_deflate24,950
+    def __init__(26,1033
+    def __call__(31,1247
+
+algorithms/inverter/mixed_precision.py,97
+class mixed_precision:mixed_precision22,890
+    def __init__(23,913
+    def __call__(28,1109
+
+algorithms/inverter/bicgstab.py,109
+class bicgstab:bicgstab24,933
+    def __init__(26,1002
+    def __call__(32,1166
+        def inv(40,1421
+
+algorithms/inverter/split.py,102
+class split:split23,901
+    def __init__(25,955
+    def __call__(29,1063
+        def inv(37,1311
+
+algorithms/inverter/mr.py,97
+class mr:mr24,958
+    def __init__(30,1165
+    def __call__(37,1366
+        def inv(45,1621
+
+algorithms/inverter/fgcr.py,206
+class fgcr:fgcr24,976
+    def __init__(28,1096
+    def modified(38,1412
+    def update_psi(41,1492
+    def restart(51,1819
+    def calc_res(57,2008
+    def __call__(61,2131
+        def inv(71,2452
+
+algorithms/inverter/cg.py,97
+class cg:cg23,957
+    def __init__(25,1020
+    def __call__(31,1184
+        def inv(39,1439
+
+algorithms/inverter/sequence.py,107
+class sequence:sequence23,901
+    def __init__(24,917
+    def __call__(27,989
+        def inv(31,1089
+
+algorithms/inverter/multi_grid.py,344
+def get_slv_name(26,999
+def get_slv_history(33,1152
+class setup:setup41,1345
+    def __init__(42,1358
+    def __call__(164,5855
+class inverter:inverter284,9933
+    def __init__(285,9949
+    def __call__(331,11702
+        def inv_lvl(340,11996
+                    def prec(398,13939
+                        def ignore_mat(399,13977
+
+algorithms/inverter/fgmres.py,237
+class fgmres:fgmres24,976
+    def __init__(28,1098
+    def modified(38,1414
+    def qr_update(41,1496
+    def update_psi(61,2166
+    def restart(69,2441
+    def calc_res(78,2708
+    def __call__(82,2831
+        def inv(92,3152
+
+algorithms/inverter/defect_correcting.py,127
+class defect_correcting:defect_correcting23,901
+    def __init__(76,2674
+    def __call__(83,2899
+        def inv(87,2991
+
+algorithms/polynomial/chebyshev.py,264
+def make_list(27,1010
+def undo_list(33,1086
+def coeffs_func(39,1179
+def coeffs_order(57,1715
+class chebyshev:chebyshev61,1804
+    def __init__(70,1996
+    def eval(85,2599
+    def evalD(116,3371
+    def __call__(137,4002
+            def evalOp(147,4376
+
+algorithms/markov/metropolis.py,89
+class metropolis:metropolis28,1030
+    def __init__(30,1113
+    def __call__(34,1203
+
+algorithms/markov/su2_heat_bath.py,95
+class su2_heat_bath:su2_heat_bath29,1049
+    def __init__(31,1130
+    def __call__(35,1220
+
+algorithms/modes/a2a.py,47
+class a2a:a2a22,885
+    def __init__(23,896
+
+algorithms/modes/matrix.py,44
+def matrix(29,1104
+    def approx(37,1410
+
+algorithms/modes/__init__.py,0
+
+algorithms/markov/__init__.py,0
+
+algorithms/__init__.py,0
+
+algorithms/polynomial/__init__.py,0
+
+algorithms/inverter/__init__.py,0
+
+algorithms/eigen/__init__.py,0
+
+qis/backends/__init__.py,0
+
+qis/backends/dynamic/__init__.py,0
+
+qis/backends/static/__init__.py,0
+
+qis/__init__.py,0
+
+core/io/__init__.py,0
+
+core/operator/__init__.py,0
+
+core/__init__.py,0
+
+core/block/coordinates.py,0
+
+qcd/gauge/__init__.py,0
+
+qcd/gauge/smear/__init__.py,0
+
+qcd/__init__.py,0
+
+qcd/fermion/reference/__init__.py,0
+
+qcd/fermion/preconditioner/__init__.py,0
