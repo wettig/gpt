@@ -16,5 +16,5 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-from gpt.qcd.fermion.reference.wilson import wilson
+from gpt.qcd.fermion.reference.wilson_clover import wilson_clover
 from gpt.qcd.fermion.reference.staggered import staggered
