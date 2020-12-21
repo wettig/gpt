@@ -23,7 +23,7 @@ BUILD=$(basename $GRID)
 NPARALLEL=$2
 if [[ "$NPARALLEL" == "" ]];
 then
-    NPARALLEL=16
+    NPARALLEL=4
 fi
 
 # Start
