@@ -120,16 +120,21 @@ class staggered(shift, matrix_operator):
         assert dst != src
         dst[:] = 0
         for mu in range(4):
-            src_plus = self.forward[mu] * src
-            src_minus = self.backward[mu] * src
+            # eval() does numerical evaluation and may give higher performance
+            src_plus = g.eval(self.forward[mu] * src)
+            src_minus = g.eval(self.backward[mu] * src)
             if self.chiral:
-                src_plus = self.theta[mu] * src_plus
-                src_minus = g.cshift(self.theta[mu], mu, -1) * src_minus
+                src_plus = g.eval(self.theta[mu] * src_plus)
+                src_minus = g.eval(g.cshift(self.theta[mu], mu, -1) * src_minus)
             dst += self.phases[mu] * (src_plus - src_minus) / 2.0
         if self.mu5 != 0.0:
             for [i, j, k] in permutations([0, 1, 2]):
-                src_plus = self.forward[i] * self.forward[j] * self.forward[k] * src
-                src_minus = self.backward[k] * self.backward[j] * self.backward[i] * src
+                src_plus = g.eval(
+                    self.forward[i] * self.forward[j] * self.forward[k] * src
+                )
+                src_minus = g.eval(
+                    self.backward[k] * self.backward[j] * self.backward[i] * src
+                )
                 dst += self.s * (src_plus + src_minus) * self.mu5 / (-12.0)
 
     def _M(self, dst, src):
