@@ -36,6 +36,8 @@ class staggered(shift_eo, matrix_operator):
     @params_convention()
     def __init__(self, U, params):
 
+        assert U[0].grid.nd == 4, "Only 4 dimensions implemented for now."
+
         # there could be a chiral U(1) field after U
         shift_eo.__init__(self, U[0:4], params)
 
@@ -108,7 +110,8 @@ class staggered(shift_eo, matrix_operator):
 
         # theta is the chiral U(1) gauge field
         if self.chiral:
-            assert "mu5" not in params, "cannot have both mu5 and chiral in params"
+            # for now, allow both mu5 and chiral U(1) field for testing purposes
+            # assert "mu5" not in params, "should not have both mu5 and chiral in params"
             assert len(U) == 8, "chiral U(1) field missing?"
             self.theta = {}
             for cb in [g.even, g.odd]:
