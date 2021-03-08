@@ -27,10 +27,11 @@ from itertools import permutations
 class staggered(shift_eo, matrix_operator):
     """
     D_xy = 1/2 sum_mu eta_mu(x) [ U_mu(x) delta_{x+mu,y} - U_mu^dagger(x-mu) delta_{x-mu,y} ] + m delta_xy
-    * gauge field could also be SU(n) or adjoint (see otype)
-    * mu5: coefficient of chiral chemical potential, see Eqs. (2.2) and (2.3) in
-      https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
-    * chiral: if True, chiral U(1) gauge field is present (in U list after the SU field)
+    * gauge field could also be adjoint (see otype)
+    * extensions (passed in params):
+      - mu5: coefficient of chiral chemical potential, see Eqs. (2.2) and (2.3) in
+        https://link.springer.com/content/pdf/10.1007/JHEP06(2015)094.pdf
+      - chiral_U1: chiral U(1) gauge field
     """
 
     @params_convention()
@@ -38,8 +39,7 @@ class staggered(shift_eo, matrix_operator):
 
         assert U[0].grid.nd == 4, "Only 4 dimensions implemented for now."
 
-        # there could be a chiral U(1) field after U
-        shift_eo.__init__(self, U[0:4], params)
+        shift_eo.__init__(self, U, params)
 
         # stuff that's needed later on
         Ndim = U[0].otype.Ndim
@@ -62,7 +62,7 @@ class staggered(shift_eo, matrix_operator):
             params["mass"] if "mass" in params and params["mass"] != 0.0 else None
         )
         self.mu5 = params["mu5"] if "mu5" in params and params["mu5"] != 0.0 else None
-        self.chiral = params["chiral"] if "chiral" in params else None
+        self.chiral_U1 = params["chiral_U1"] if "chiral_U1" in params else None
 
         # matrix operators
         self.Mooee = g.matrix_operator(
@@ -109,15 +109,19 @@ class staggered(shift_eo, matrix_operator):
             self.phases[cb] = _phases_eo
 
         # theta is the chiral U(1) gauge field
-        if self.chiral:
+        if self.chiral_U1:
             # for now, allow both mu5 and chiral U(1) field for testing purposes
-            # assert "mu5" not in params, "should not have both mu5 and chiral in params"
-            assert len(U) == 8, "chiral U(1) field missing?"
+            # assert "mu5" not in params, "should not have both mu5 and chiral_U1 in params"
+            assert (
+                len(self.chiral_U1) == 4
+            ), "chiral U(1) field should be list of length 4"
             self.theta = {}
             for cb in [g.even, g.odd]:
-                _theta_eo = [g.lattice(grid_eo, U[4].otype) for i in range(4)]
+                _theta_eo = [
+                    g.lattice(grid_eo, self.chiral_U1[0].otype) for i in range(4)
+                ]
                 for mu in range(4):
-                    g.pick_checkerboard(cb, _theta_eo[mu], U[4 + mu])
+                    g.pick_checkerboard(cb, _theta_eo[mu], self.chiral_U1[mu])
                 self.theta[cb] = _theta_eo
 
         # s(x) is defined between (2.2) and (2.3) in
@@ -153,20 +157,18 @@ class staggered(shift_eo, matrix_operator):
         phases_cb = self.phases[cb.inv()]
         dst.checkerboard(cb.inv())
         dst[:] = 0
-        if self.chiral:
+        if self.chiral_U1:
             theta_cb = self.theta[cb]
             theta_cbi = self.theta[cb.inv()]
-        if self.mu5:
-            s_cbi = self.s[cb.inv()]
         for mu in range(4):
-            # eval() does numerical evaluation and may give higher performance
             src_plus = g.eval(scbi.forward[mu] * src)
             src_minus = g.eval(scb.backward[mu] * src)
-            if self.chiral:
+            if self.chiral_U1:
                 src_plus = g.eval(theta_cbi[mu] * src_plus)
                 src_minus = g.eval(g.cshift(theta_cb[mu], mu, -1) * src_minus)
             dst += phases_cb[mu] * (src_plus - src_minus) / 2.0
         if self.mu5:
+            s_cbi = self.s[cb.inv()]
             for [i, j, k] in permutations([0, 1, 2]):
                 src_plus = g.eval(
                     scbi.forward[i] * scb.forward[j] * scbi.forward[k] * src
