@@ -1,67 +1,66 @@
 #!/usr/bin/env python3
 #
-# Authors: Tilo Wettig 2020
+# Authors: Tilo Wettig 2021
 #
-# Desc.: Test reference implementation of staggered Dirac operator
-#
-# general properties
-# * the eigenvalues of D_hop and D_5 are imaginary and occur in pairs +/- i\lambda
-# * for SU(2) fundamental, the eigenvalues are doubly degenerate
-# * the total number of eigenvalues is Nrep*V
-#   - Nrep = Nc (fundamental) or Nc^2-1 (adjoint)
-#   - V = lattice volume
-# * sum rules:  tr(-D_hop^2) = 2*Nrep*V = 2*Nev
-#               tr(-D_5^2)   = < tr \bar U_delta \bar U_delta^\dagger > * V/2
+# Desc.: Test reference implementation of staggered Dirac operator.
+#        For properties of the eigenvalues, see arXiv:xxx.
 
 import gpt as g
 import numpy as np
-import sys
 from itertools import permutations
 
 
-def compute_sum(U, p):
+def compute_evals_numpy(U, p):
+    r"""
+    The eigenvalues come in pairs (\lambda+m, -\lambda+m). Therefore we compute
+    only half of the spectrum, which asymptotically saves 8x in runtime.
     """
-    Compute sum of squared eigenvalues of staggered operator
-    Inputs: U = gauge field (possibly including chiral U(1) gauge field)
-            p = staggered parameters
-    Output: sum of eigenvalues squared
-    """
-    # dimension of vector on which D acts depends on Nc and on fermion representation
-    Nrep = U[0].otype.Ndim
-    Volume = U[0].grid.fsites
-
-    # staggered operator
+    # operator
     stagg = g.qcd.fermion.reference.staggered(U, p)
-
-    # start vector
-    start = g.vector_color(U[0].grid, Nrep)
-    start[:] = g.vector_color([1 for i in range(Nrep)], Nrep)
-
-    # Arnoldi with modest convergence criterion
-    # Typically the Krylov space needs to be larger than Nev to find all evals.
-    # The extraneous evals found by Arnoldi are essentially zero.
-    # * Nstop = number of evals to be computed
-    # * Nmin = when to start checking convergence (must be >= Nstop)
-    # * Nstep = interval for convergence checks (should not be too small to minimize cost of check)
-    # * Nmax = when to abort
-    Nev = Nrep * Volume
-    Neval = Nev + 50
-    a = g.algorithms.eigen.arnoldi(
-        Nmin=Neval, Nmax=Neval, Nstep=20, Nstop=Neval, resid=1e-5
+    op = stagg.Meooe * stagg.Meooe + stagg.Mooee * stagg.Mooee
+    # sizes
+    Nrep = U[0].otype.Ndim
+    N = Nrep * U[0].grid.fsites // 2
+    grid_eo = U[0].grid.checkerboarded(g.redblack)
+    # allocate gpt vectors and numpy arrays (including dense matrix for operator)
+    xg = g.vector_color(grid_eo, Nrep)
+    yg = g.vector_color(grid_eo, Nrep)
+    xn = np.zeros(N, complex)
+    yn = np.empty(N, complex)
+    D = np.empty((N, N), complex, order="F")  # "F" for column-major storage
+    # create copy_plans between gpt and numpy
+    g2n = g.copy_plan(yn, yg)
+    g2n.source += yg.view[:]
+    g2n.destination += g.global_memory_view(
+        yg.grid,
+        [[yg.grid.processor, yn, 0, yn.nbytes]] if yn.nbytes > 0 else None,
     )
-    evec, evals = a(stagg, start)
-
-    # extract imaginary parts and delete extraneous eigenvalues near zero
-    ev = evals.imag
-    ev.sort()
-    ev = np.concatenate([ev[: Nev // 2], ev[-Nev // 2 :]])
-
-    return sum(ev * ev)
+    g2n = g2n()
+    n2g = g.copy_plan(xg, xn)
+    n2g.source += g.global_memory_view(
+        xg.grid,
+        [[xg.grid.processor, xn, 0, xn.nbytes]] if xn.nbytes > 0 else None,
+    )
+    n2g.destination += xg.view[:]
+    n2g = n2g()
+    # compute matrix D of staggered operator
+    for i in range(N):
+        xn[i] = 1
+        n2g(xg, xn)
+        xn[i] = 0
+        yg @= op * xg
+        g2n(yn, yg)
+        D[:, i] = yn
+    # compute eigenvalues
+    evals = np.linalg.eigvals(D)
+    mass = p["mass"] if "mass" in p else 0.0
+    return np.sqrt(evals - mass ** 2) + mass
 
 
 def Udelta_average(U):
-    """
-    compute < tr Udelta * Udelta^\dagger >
+    r"""
+    Compute the average <\bar U_\delta(x)\bar U_\delta(x)^\dagger>,
+    see Eq. (2.3) in arXiv:1503.06670 but with my change of notation
     """
     Volume = float(U[0].grid.fsites)
     Udelta = g.lattice(U[0].grid, U[0].otype)
@@ -71,80 +70,111 @@ def Udelta_average(U):
     return g.sum(g.trace(Udelta * g.adj(Udelta))).real / Volume / 36.0
 
 
-def test_sumrule(U, p):
+def sumrule_expected(U, p):
     """
-    Check exact sum rule for tr(D_hop^2) or tr(D_5^2)
-    Inputs: U = gauge field
-            p = staggered parameters
+    Expected sum of staggered eigenvalues squared.
     """
-    # sanity checks
-    assert p["mass"] == 0, "Mass parameter must be zero."
-    assert p["hop"] == 0 or p["mu5"] == 0, "Either hop or mu5 must be zero."
-
-    # extract parameters for output message
-    Nc = U[0].otype.Nc
-    if "adjoint" in U[0].otype.__name__:
-        rep = "adjoint"
-        Nrep = Nc * Nc - 1
-    else:
-        rep = "fundamental"
-        Nrep = Nc
-
-    # compute sum
-    summe = compute_sum(U, p)
-
-    # check sum rule
-    Volume = U[0].grid.fsites
-    if p["hop"] != 0:
-        operator = "D_hop"
-        expected = 2 * Nrep * Volume
-    else:
-        operator = "D_5"
-        expected = Udelta_average(U) * Volume / 2.0
-
-    g.message("-----------------------------------------------------------")
-    g.message(f"Test for {operator}, SU({Nc}) {rep}.")
-    g.message(f"tr(-{operator}^2): {summe}, expected: {expected}")
-    assert abs(summe - expected) / Volume < 1e-8
-    g.message(f"Test passed for {operator}, SU({Nc}) {rep}.")
-    g.message("-----------------------------------------------------------")
-
-    return 1
+    Nrep = U[0].otype.Ndim
+    V = float(U[0].grid.fsites)
+    expected = -2.0 * Nrep
+    if "mass" in p:
+        expected += Nrep * p["mass"] ** 2
+    if "mu5" in p:
+        expected -= 0.5 * p["mu5"] ** 2 * Udelta_average(U)
+    if "chiral_U1" in p:
+        theta = p["chiral_U1"]
+        theta_sq_ave = sum([g.sum(theta[mu] * theta[mu]) for mu in range(4)]) / 4.0 / V
+        expected -= 2.0 * Nrep * (theta_sq_ave - 1.0)
+    return expected * V
 
 
-#################################################################
-# test sum rules for different gauge groups and representations #
-#################################################################
+def compute_and_check_eigenvalues(U, p):
+    r"""
+    The eigenvalues come in pairs (\lambda+m, -\lambda+m). Therefore we compute
+    only half of the spectrum, which asymptotically saves 8x in runtime.
+    """
+    evals = compute_evals_numpy(U, p)
+    mass = p["mass"] if "mass" in p else 0.0
+    actual = 2.0 * sum((evals - mass) ** 2 + mass ** 2)
+    expected = sumrule_expected(U, p)
+    try:
+        assert abs((actual - expected) / expected) < 1e-8
+        g.message("sumrule satisfied")
+    except AssertionError:
+        g.message("sumrule violated")
 
-# staggered parameters
-phop = {
-    "mass": 0,
-    "hop": 1,
-    "mu5": 0,
-    "boundary_phases": [1.0, 1.0, 1.0, 1.0],
-}
-p5 = {
-    "mass": 0,
-    "hop": 0,
-    "mu5": 1,
-    "boundary_phases": [1.0, 1.0, 1.0, 1.0],
-}
 
-# grid (each dimension must be at least 4 to get correct sum rule)
-L = [8, 4, 4, 4]
-grid_dp = g.grid(L, g.double)
+def run_test(U, p, src, test_sumrule=False):
+    # stagg = g.qcd.fermion.reference.staggered(U, p)
+    # dst @= stagg * src
+    if test_sumrule:
+        compute_and_check_eigenvalues(U, p)
 
-# SU(2) fundamental
-U = g.qcd.gauge.random(grid_dp, g.random("test"), otype=g.ot_matrix_su2_fundamental())
-test_sumrule(U, phop)
-test_sumrule(U, p5)
 
-# SU(2) adjoint
-U = g.qcd.gauge.random(grid_dp, g.random("test"), otype=g.ot_matrix_su2_adjoint())
-test_sumrule(U, phop)
-test_sumrule(U, p5)
+def convert_U1_chiral(phi):
+    """
+    Input: U(1) gauge field phi
+    Output: chiral U(1) gauge field theta
+    * on even grid, theta = phi
+    * on odd grid, theta = adj(phi)
+    """
+    grid = phi[0].grid
+    theta = [g.complex(grid) for i in range(4)]
+    grid_eo = phi[0].grid.checkerboarded(g.redblack)
+    tmp_eo = g.complex(grid_eo)
+    for mu in range(4):
+        g.pick_checkerboard(g.even, tmp_eo, phi[mu])
+        g.set_checkerboard(theta[mu], tmp_eo)
+        g.pick_checkerboard(g.odd, tmp_eo, phi[mu])
+        g.set_checkerboard(theta[mu], g.eval(g.adj(tmp_eo)))
+    return theta
 
-# SU(3) fundamental
-U = g.qcd.gauge.random(grid_dp, g.random("test"))
-test_sumrule(U, phop)
-test_sumrule(U, p5)
+
+def main(test_sumrule=False):
+    # grid (every dimension must be larger than 2 to get correct sum rule)
+    L = [4, 4, 4, 4]
+    grid = g.grid(L, g.double)
+    rng = g.random("test", "vectorized_ranlux24_24_64")
+
+    # chiral U(1) field
+    theta = [g.complex(grid) for i in range(4)]
+    rng.uniform_real(theta, min=0, max=2.0 * np.pi)
+    for mu in range(4):
+        theta[mu] = g.component.exp((g.eval(1j * theta[mu])))
+    theta = convert_U1_chiral(theta)
+
+    # staggered parameters
+    mass = 1.23
+    mu5 = 2.13 + 3.12 * 1j
+    boundary_phases = [1.0, 1.0, 1.0, 1.0]
+    stagg_params = {
+        "plain": {"boundary_phases": boundary_phases},
+        "mass": {"mass": mass, "boundary_phases": boundary_phases},
+        "mu5": {"mu5": mu5, "boundary_phases": boundary_phases},
+        "chiral_U1": {"chiral_U1": theta, "boundary_phases": boundary_phases},
+        "all": {
+            "mass": mass,
+            "mu5": mu5,
+            "chiral_U1": theta,
+            "boundary_phases": boundary_phases,
+        },
+    }
+
+    reps = [
+        eval("g.ot_matrix_" + rep)
+        for rep in [
+            "su_n_fundamental_group(2)",
+            "su_n_adjoint_group(2)",
+            "su_n_fundamental_group(3)",
+        ]
+    ]
+    for rep in reps:
+        U = g.qcd.gauge.random(grid, g.random("test"), otype=rep)
+        src = rng.cnormal(g.vector_color(grid, rep.Ndim))
+        for params in stagg_params.values():
+            run_test(U, params, src, test_sumrule)
+
+
+if __name__ == "__main__":
+    # use test_sumrule=True to test sumrules (takes long)
+    main(test_sumrule=True)
