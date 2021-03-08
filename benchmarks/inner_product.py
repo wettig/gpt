@@ -2,7 +2,7 @@
 #
 # Authors: Christoph Lehner 2020
 #
-# Benchmark Linear Algebra
+# Benchmark Inner Products
 #
 import gpt as g
 
@@ -25,16 +25,17 @@ rng = g.random("benchmark")
 for precision in [g.single, g.double]:
     grid = g.grid(g.default.get_ivec("--grid", [16, 16, 16, 32], 4), precision)
     N = 100
+    Nwarmup = 5
     g.message(
         f"""
-DWF Linear Algebra Benchmark with
+Inner Product Benchmark with
     fdimensions  : {grid.fdimensions}
     precision    : {precision.__name__}
 """
     )
 
     # Source and destination
-    for tp in [g.ot_singlet(), g.ot_vector_spin_color(4, 3), g.ot_vsinglet(12)]:
+    for tp in [g.ot_singlet(), g.ot_vector_spin_color(4, 3), g.ot_vector_singlet(12)]:
         for n in [1, 4]:
             one = [g.lattice(grid, tp) for i in range(n)]
             two = [g.lattice(grid, tp) for i in range(n)]
@@ -51,12 +52,14 @@ DWF Linear Algebra Benchmark with
 
                     # Time
                     dt = 0.0
-                    for it in range(N):
+                    for it in range(N + Nwarmup):
                         access(one)
                         access(two)
-                        dt -= g.time()
+                        if it >= Nwarmup:
+                            dt -= g.time()
                         ip = g.rank_inner_product(one, two, use_accelerator)
-                        dt += g.time()
+                        if it >= Nwarmup:
+                            dt += g.time()
 
                     # Report
                     GBPerSec = nbytes / dt / 1e9

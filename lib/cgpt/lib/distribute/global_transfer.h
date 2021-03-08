@@ -36,15 +36,15 @@ global_transfer<rank_t>::global_transfer(rank_t _rank, Grid_MPI_Comm _comm) : ra
 }
 
 template<typename rank_t>
-void global_transfer<rank_t>::global_sum(std::vector<uint64_t>& data) {
+void global_transfer<rank_t>::global_sum(uint64_t* pdata, size_t size) {
 #ifdef CGPT_USE_MPI
-  ASSERT(MPI_SUCCESS == MPI_Allreduce(MPI_IN_PLACE,&data[0],data.size(),MPI_UINT64_T,MPI_SUM,comm));
+  ASSERT(MPI_SUCCESS == MPI_Allreduce(MPI_IN_PLACE,pdata,size,MPI_UINT64_T,MPI_SUM,comm));
 #endif
 }
 
 template<typename rank_t>
-template<typename data_t>
-void global_transfer<rank_t>::root_to_all(const std::map<rank_t, std::vector<data_t> > & all, std::vector<data_t>& my) {
+template<typename vec_t>
+void global_transfer<rank_t>::root_to_all(const std::map<rank_t, vec_t > & all, vec_t & my) {
 
   // store mine
   if (rank == 0) {
@@ -62,6 +62,7 @@ void global_transfer<rank_t>::root_to_all(const std::map<rank_t, std::vector<dat
     auto e = all.find(i);
     all_size[i] = (e != all.end()) ? (int)e->second.size() : 0;
   }
+
   ASSERT(MPI_SUCCESS == MPI_Scatter(&all_size[0], 1, MPI_INT, &my_size, 1, MPI_INT, mpi_rank_map[0], comm));
 
   // root node now receives from every node the list of its partners (if it is non-vanishing)
@@ -93,8 +94,21 @@ void global_transfer<rank_t>::root_to_all(const std::map<rank_t, std::vector<dat
 }
 
 template<typename rank_t>
-template<typename data_t>
-void global_transfer<rank_t>::all_to_root(const std::vector<data_t>& my, std::map<rank_t, std::vector<data_t> > & all) {
+long global_transfer<rank_t>::global_gcd(long n) {
+
+#ifdef CGPT_USE_MPI
+  std::vector<long> all_n(mpi_ranks,0);
+  ASSERT(MPI_SUCCESS == MPI_Allgather(&n, 1, MPI_LONG, &all_n[0], 1, MPI_LONG, comm));
+  return cgpt_reduce(all_n, cgpt_gcd, n);
+#else
+  return n;
+#endif
+  
+}
+
+template<typename rank_t>
+template<typename vec_t>
+void global_transfer<rank_t>::all_to_root(const vec_t& my, std::map<rank_t, vec_t > & all) {
 
   // store mine
   if (rank == 0)
@@ -113,7 +127,7 @@ void global_transfer<rank_t>::all_to_root(const std::vector<data_t>& my, std::ma
       int rank_size = all_size[mpi_rank_map[i]];
 
       if (rank_size != 0) {
-	std::vector<data_t> & data = all[i];
+	auto & data = all[i];
 	data.resize(rank_size);
 
 	irecv(i,data);
@@ -251,7 +265,7 @@ void global_transfer<rank_t>::multi_send_recv(const std::map<rank_t, comm_messag
 
   // allocate receive buffers
   for (auto & s : my_senders) {
-    recv[s.first].data.resize(s.second);
+    recv[s.first].resize(s.second);
   }
 
   // initiate communication

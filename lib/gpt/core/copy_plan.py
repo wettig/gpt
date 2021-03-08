@@ -18,6 +18,8 @@
 #
 import cgpt, gpt, numpy
 
+verbose_performance = gpt.default.is_verbose("copy_plan_performance")
+
 
 class _view:
     def __init__(self, obj):
@@ -52,14 +54,17 @@ class copy_plan_view:
         n = 0
         self.memory_layout = {}
         self.data = data  # keep reference to data so that id(x) stays unique for lifetime of this instance
+        self.requires_host_memory = False
         for x in gpt.util.to_list(data):
             self.memory_layout[id(x)] = n
             if isinstance(x, gpt.lattice):
                 n += len(x.v_obj)
             elif isinstance(x, memoryview):
                 n += 1
+                self.requires_host_memory = True
             elif isinstance(x, numpy.ndarray):
                 n += 1
+                self.requires_host_memory = True
             else:
                 raise Exception(f"Unknown data type {type(x)}")
 
@@ -87,7 +92,19 @@ class copy_plan_executer:
     def __call__(self, dst, src):
         dst = gpt.util.to_list(dst)
         src = gpt.util.to_list(src)
+        if verbose_performance:
+            t0 = gpt.time()
         cgpt.copy_execute_plan(self.obj, dst, src, self.lattice_view_location)
+        if verbose_performance:
+            t1 = gpt.time()
+            info = [a for v in self.info().values() for a in v.values()]
+            blocks = sum([a["blocks"] for a in info])
+            size = sum([a["size"] for a in info])
+            block_size = size // blocks
+            GB = 2 * size / 1e9  # read + write = factor of 2
+            gpt.message(
+                f"copy_plan: execute: {GB:g} GB at {GB/(t1-t0):g} GB/s/rank with block_size {block_size}"
+            )
 
     def info(self):
         return cgpt.copy_get_plan_info(self.obj)
@@ -98,15 +115,22 @@ class copy_plan:
         self,
         dst,
         src,
-        lattice_view_location="host",
-        communication_buffer_location="host",
         embed_in_communicator=None,
-    ):  # host/accelerator/none
-        self.communication_buffer_location = communication_buffer_location
-        self.lattice_view_location = lattice_view_location
-
+    ):
         self.destination = copy_plan_view(dst, embed_in_communicator)
         self.source = copy_plan_view(src, embed_in_communicator)
+
+        data_location = (
+            gpt.host
+            if (
+                self.destination.requires_host_memory
+                or self.source.requires_host_memory
+            )
+            else gpt.accelerator
+        )
+
+        self.communication_buffer_location = data_location
+        self.lattice_view_location = data_location
 
     def __call__(self, local_only=False, skip_optimize=False):
         return copy_plan_executer(
